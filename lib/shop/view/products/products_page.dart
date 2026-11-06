@@ -1,5 +1,4 @@
 import 'package:privat_test/core/view/app/theme/theme_cubit.dart';
-import 'package:privat_test/core/view/app/widgets/offline_banner.dart';
 import 'package:privat_test/core/view/export.dart';
 import 'package:privat_test/shop/view/products/products_cubit.dart';
 import 'package:privat_test/shop/view/products/widgets/products_grid.dart';
@@ -23,7 +22,6 @@ class _ProductsPageState extends State<ProductsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<ProductsCubit>().state;
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
 
@@ -47,7 +45,6 @@ class _ProductsPageState extends State<ProductsPage> {
               onChanged: context.read<ProductsCubit>().onQueryChanged,
             ),
           ),
-          if (state.isOffline) const OfflineBanner(),
           const Expanded(child: ProductsGrid()),
         ],
       ),

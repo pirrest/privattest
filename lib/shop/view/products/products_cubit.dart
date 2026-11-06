@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:privat_test/shop/controller/products_service.dart';
-import 'package:privat_test/shop/controller/products_service_event.dart';
 import 'package:privat_test/shop/model/product.dart';
 import 'package:privat_test/core/utils/my_cubit.dart';
 
@@ -15,11 +14,7 @@ class ProductsCubit extends MyCubit<ProductsState> {
   final ProductsService _productsService;
   Timer? _debounce;
 
-  ProductsCubit(this._productsService) : super(const ProductsState()) {
-    _productsService.addListenerOf<ProductsServiceEventServedFromCache>(
-      _onServedFromCache,
-    );
-  }
+  ProductsCubit(this._productsService) : super(const ProductsState());
 
   /// Called on every change of the search field.
   void onQueryChanged(String text) {
@@ -47,23 +42,18 @@ class ProductsCubit extends MyCubit<ProductsState> {
     final page = await _productsService.loadPage(query: query, skip: skip);
     if ((state.searchQuery ?? '') != query) return const [];
 
-    emit(state.copyWith(totalItems: page.total, isOffline: page.fromCache));
+    emit(state.copyWith(totalItems: page.total));
     return page.items;
   }
 
   @override
   Future<void> close() {
     _debounce?.cancel();
-    _productsService.removeListener(_onServedFromCache);
     return super.close();
   }
 
   void _startSearch(String query) {
     if (state.query != query) return;
     emit(state.copyWith(searchQuery: query, clearTotal: true));
-  }
-
-  void _onServedFromCache(ProductsServiceEventServedFromCache event) {
-    emit(state.copyWith(isOffline: true));
   }
 }

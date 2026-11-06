@@ -6,21 +6,32 @@ class OfflineBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
+    // The banner sits above the Navigator, so it needs its own Material.
+    return Material(
       color: colors.secondaryContainer,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Icon(Icons.cloud_off, size: 18, color: colors.onSecondaryContainer),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'common.offlineBanner'.tr(),
-              style: TextStyle(color: colors.onSecondaryContainer),
-            ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.cloud_off,
+                size: 18,
+                color: colors.onSecondaryContainer,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  'common.offlineBanner'.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: colors.onSecondaryContainer),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

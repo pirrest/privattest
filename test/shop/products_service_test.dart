@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:privat_test/shop/controller/products_service.dart';
-import 'package:privat_test/shop/controller/products_service_event.dart';
 import 'package:privat_test/shop/model/exceptions/product_not_found_exception.dart';
 import 'package:privat_test/shop/model/repositories/products_repo.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -13,7 +12,6 @@ void main() {
   late FakeShopApiService api;
   late ProductsRepo repo;
   late ProductsService service;
-  late List<ProductsServiceEvent> events;
 
   setUpAll(sqfliteFfiInit);
 
@@ -22,13 +20,9 @@ void main() {
     repo = ProductsRepo(databaseFactoryFfi, inMemoryDatabasePath);
     await repo.init();
     service = ProductsService(api, repo);
-    events = [];
-    service.addListener(events.add);
   });
 
   tearDown(() => repo.close());
-
-  Future<void> flush() => Future<void>.delayed(Duration.zero);
 
   group('loadPage', () {
     test('returns API results and caches them', () async {
@@ -41,10 +35,7 @@ void main() {
 
       expect(page.items.map((p) => p.id), [1, 2]);
       expect(page.total, 7);
-      expect(page.fromCache, isFalse);
       expect(await repo.count(''), 2);
-      await flush();
-      expect(events, isEmpty);
     });
 
     test('falls back to the cache when there is no connection', () async {
@@ -63,12 +54,9 @@ void main() {
 
       api.onSearch = (query, limit, skip) async => throw noConnectionError();
       final page = await service.loadPage(query: 'mascara', skip: 0);
-      await flush();
 
-      expect(page.fromCache, isTrue);
       expect(page.items.map((p) => p.id), [1]);
       expect(page.total, 1);
-      expect(events.single, isA<ProductsServiceEventServedFromCache>());
     });
 
     test(
@@ -98,7 +86,6 @@ void main() {
       api.onGetProducts = (limit, skip) async => throw noConnectionError();
       final page = await service.loadPage(query: '', skip: 0);
 
-      expect(page.fromCache, isTrue);
       expect(page.items.map((p) => p.id), [1, 2]);
     });
 
@@ -128,10 +115,8 @@ void main() {
 
       api.onGetProduct = (id) async => throw noConnectionError();
       final product = await service.loadProduct(5);
-      await flush();
 
       expect(product.id, 5);
-      expect(events.single, isA<ProductsServiceEventServedFromCache>());
     });
 
     test('throws ProductNotFoundException when offline and not cached', () {

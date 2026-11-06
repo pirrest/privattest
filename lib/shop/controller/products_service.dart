@@ -4,14 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:privat_test/core/utils/casting.dart';
 import 'package:privat_test/shop/controller/shop_api_service.dart';
 import 'package:privat_test/core/controller/logger_service.dart';
-import 'package:privat_test/shop/controller/products_service_event.dart';
 import 'package:privat_test/shop/model/exceptions/product_not_found_exception.dart';
 import 'package:privat_test/shop/model/product.dart';
 import 'package:privat_test/shop/model/products_page.dart';
 import 'package:privat_test/shop/model/repositories/products_repo.dart';
-import 'package:privat_test/core/utils/dispatcher.dart';
+import 'package:privat_test/core/utils/dio_extensions.dart';
 
-class ProductsService extends Dispatcher<ProductsServiceEvent> {
+class ProductsService {
   static const pageSize = 20;
 
   final ShopApiService _apiService;
@@ -46,7 +45,7 @@ class ProductsService extends Dispatcher<ProductsServiceEvent> {
         skip: skip,
       );
     } on DioException catch (e) {
-      if (!_isConnectionFailure(e)) rethrow;
+      if (!e.isConnectionFailure) rethrow;
 
       final items = await _productsRepo.queryPage(
         query: query,
@@ -54,13 +53,7 @@ class ProductsService extends Dispatcher<ProductsServiceEvent> {
         skip: skip,
       );
       final total = await _productsRepo.count(query);
-      dispatch(const ProductsServiceEventServedFromCache());
-      return ProductsPage(
-        items: items,
-        total: total,
-        skip: skip,
-        fromCache: true,
-      );
+      return ProductsPage(items: items, total: total, skip: skip);
     }
   }
 
@@ -77,19 +70,14 @@ class ProductsService extends Dispatcher<ProductsServiceEvent> {
       if (e.response?.statusCode == HttpStatus.notFound) {
         throw ProductNotFoundException(id);
       }
-      if (!_isConnectionFailure(e)) rethrow;
+      if (!e.isConnectionFailure) rethrow;
 
       final cached = await _productsRepo.getById(id);
       if (cached == null) throw ProductNotFoundException(id);
 
-      dispatch(const ProductsServiceEventServedFromCache());
       return cached;
     }
   }
-
-  /// A DioException without a response means the request never reached the
-  /// server (offline, DNS failure, timeout).
-  bool _isConnectionFailure(DioException e) => e.response == null;
 
   Future<void> _cache(List<Product> products) async {
     try {

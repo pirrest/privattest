@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:privat_test/core/controller/commands/initialize_app_result.dart';
 import 'package:privat_test/core/controller/config_service.dart';
+import 'package:privat_test/core/controller/connection_service.dart';
 import 'package:privat_test/core/controller/http_client.dart';
 import 'package:privat_test/core/controller/logger_service.dart';
 import 'package:watch_it/watch_it.dart';
@@ -20,8 +21,12 @@ class InitializeAppCommand {
     try {
       di.registerSingleton(LoggerService());
       di.registerSingleton(ConfigService.fromEnvironment());
+      di.registerSingleton(ConnectionService());
       di.registerLazySingleton(
-        () => HttpClient(baseUrl: di<ConfigService>().apiBaseUrl),
+        () => HttpClient(
+          baseUrl: di<ConfigService>().apiBaseUrl,
+          connectionService: di(),
+        ),
       );
       di.registerLazySingleton<GoRouter>(
         () => GoRouter(initialLocation: initialLocation, routes: routes),

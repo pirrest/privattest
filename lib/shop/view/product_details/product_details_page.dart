@@ -15,10 +15,7 @@ class ProductDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('details.title'.tr())),
       body: switch (product) {
-        final product? => ProductDetailsBody(
-          product: product,
-          isOffline: state.isOffline,
-        ),
+        final product? => ProductDetailsBody(product: product),
         null when state.isLoading => const Center(
           child: CircularProgressIndicator.adaptive(),
         ),

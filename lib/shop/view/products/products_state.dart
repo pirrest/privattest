@@ -11,15 +11,7 @@ class ProductsState extends Equatable {
   /// Total number of matches for [searchQuery], known after the first page.
   final int? totalItems;
 
-  /// True when the latest data was served from the local cache.
-  final bool isOffline;
-
-  const ProductsState({
-    this.query = '',
-    this.searchQuery,
-    this.totalItems,
-    this.isOffline = false,
-  });
+  const ProductsState({this.query = '', this.searchQuery, this.totalItems});
 
   ProductsState copyWith({
     String? query,
@@ -27,16 +19,14 @@ class ProductsState extends Equatable {
     bool clearSearchQuery = false,
     int? totalItems,
     bool clearTotal = false,
-    bool? isOffline,
   }) {
     return ProductsState(
       query: query ?? this.query,
       searchQuery: clearSearchQuery ? null : searchQuery ?? this.searchQuery,
       totalItems: clearTotal ? null : totalItems ?? this.totalItems,
-      isOffline: isOffline ?? this.isOffline,
     );
   }
 
   @override
-  List<Object?> get props => [query, searchQuery, totalItems, isOffline];
+  List<Object?> get props => [query, searchQuery, totalItems];
 }

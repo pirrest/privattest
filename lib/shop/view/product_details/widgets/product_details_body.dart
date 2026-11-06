@@ -1,5 +1,4 @@
 import 'package:privat_test/shop/model/product.dart';
-import 'package:privat_test/core/view/app/widgets/offline_banner.dart';
 import 'package:privat_test/core/view/export.dart';
 import 'package:privat_test/shop/view/product_details/widgets/product_header.dart';
 import 'package:privat_test/shop/view/product_details/widgets/product_image_gallery.dart';
@@ -8,19 +7,13 @@ import 'package:privat_test/shop/view/product_details/widgets/product_specs.dart
 
 class ProductDetailsBody extends StatelessWidget {
   final Product product;
-  final bool isOffline;
 
-  const ProductDetailsBody({
-    super.key,
-    required this.product,
-    required this.isOffline,
-  });
+  const ProductDetailsBody({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        if (isOffline) const OfflineBanner(),
         ProductImageGallery(
           images: product.images.isEmpty ? [product.thumbnail] : product.images,
         ),

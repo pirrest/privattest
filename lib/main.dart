@@ -7,7 +7,9 @@ import 'package:privat_test/shop/dependencies.dart';
 import 'package:privat_test/shop/view/navigation/shop_page_path.dart';
 import 'package:privat_test/shop/view/navigation/shop_routes.dart';
 import 'package:privat_test/core/view/app/theme/theme.dart';
+import 'package:privat_test/core/view/app/connection_cubit.dart';
 import 'package:privat_test/core/view/app/theme/theme_cubit.dart';
+import 'package:privat_test/core/view/app/widgets/offline_banner.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_it/watch_it.dart';
 
@@ -42,7 +44,13 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => ThemeCubit(), child: const _AppView());
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => ConnectionCubit(di())),
+      ],
+      child: const _AppView(),
+    );
   }
 }
 
@@ -59,6 +67,22 @@ class _AppView extends StatelessWidget {
       darkTheme: createMainTheme(brightness: Brightness.dark),
       themeMode: themeMode,
       routerConfig: di<GoRouter>(),
+      builder: (context, child) {
+        final isOffline = context.watch<ConnectionCubit>().state;
+        return Column(
+          children: [
+            if (isOffline) const OfflineBanner(),
+            Expanded(
+              // The banner already covers the status bar area.
+              child: MediaQuery.removePadding(
+                context: context,
+                removeTop: isOffline,
+                child: child!,
+              ),
+            ),
+          ],
+        );
+      },
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

@@ -15,8 +15,8 @@ A Flutter app for searching and browsing products from the public
   rating, stock, description, tags, specifications and reviews.
 - **Offline mode** — every product the app has seen is stored in SQLite. With no
   connection, the list and search run locally over the cached products, details open from
-  the cache, and images come from the disk cache. A banner tells you when the
-  data is served from the cache.
+  the cache, and images come from the disk cache. A banner at the top of every
+  screen tells you when the app cannot reach the server.
 - **Deep links** — `privattest://app/product/{id}` opens the details of that
   product, from a cold start or while the app is running. Back returns to the list.
 
@@ -73,8 +73,8 @@ and `view`:
 - **`lib/core`** — everything shared across the app. It never imports `shop`.
   - `utils/` — `Dispatcher` (a small event bus), `MyCubit`, helpers.
   - `controller/` — the app-wide services `ConfigService` (typed settings from
-    the `--dart-define-from-file` config), `HttpClient` (dio) and
-    `LoggerService`, and in `controller/commands/` the `InitializeAppCommand`:
+    the `--dart-define-from-file` config), `HttpClient` (dio),
+    `ConnectionService` and `LoggerService`, and in `controller/commands/` the `InitializeAppCommand`:
     it registers these plus the router, then lets each domain register itself.
   - `view/` — router, theme, the shared `export.dart` barrel and widgets used
     by any screen (`ErrorView`, `OfflineBanner`, `CachedImage`).
@@ -95,14 +95,21 @@ Dependencies point downwards: shop → core, and within a domain
 view/cubits → controller (services, commands) → model (repositories, data classes).
 
 - **Dispatcher.** Services extend `Dispatcher<Event>` and publish sealed events.
-  Cubits subscribe to them (`ProductsServiceEventServedFromCache` drives the
-  offline banner).
+  Cubits subscribe to them (`ConnectionService` publishes
+  `ConnectionServiceEventChanged`, which `ConnectionCubit` turns into the
+  global offline banner).
 - **API services.** One shared `HttpClient`; every domain has its own API
   service on top of it (`ShopApiService`) with its own paths, so a new feature
   adds a service next to its code without touching core.
 - **Offline fallback.** `ProductsService` always tries the API first and caches
   what it returns. Only a failure with no response at all (offline, DNS,
   timeout) switches to the cache; real HTTP errors are shown as errors.
+- **Offline banner.** It is global and does not belong to any feature. An
+  interceptor in the core `HttpClient` reports every request to
+  `ConnectionService`: a failure with no response marks the app offline, any
+  answer from the server (even an HTTP error) marks it online. The banner is
+  shown above the router in `main.dart`. There is no polling, so it clears on
+  the next successful request.
 - **DI** is `get_it` (through `watch_it`) via `di()`. `InitializeAppCommand` registers the core
   services; each domain registers its own (`registerShopDependencies`).
 
