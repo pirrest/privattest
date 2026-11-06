@@ -1,6 +1,7 @@
 {
   "common": {
     "retry": "Retry",
+    "close": "Close",
     "price": "${}",
     "offlineBanner": "You are offline. Showing cached data."
   },

@@ -1,5 +1,7 @@
 import 'package:privat_test/core/view/app/widgets/cached_image.dart';
 import 'package:privat_test/core/view/export.dart';
+import 'package:privat_test/shop/view/product_details/widgets/image_page_dots.dart';
+import 'package:privat_test/shop/view/product_details/widgets/product_image_viewer.dart';
 
 class ProductImageGallery extends StatefulWidget {
   final List<String> images;
@@ -11,45 +13,55 @@ class ProductImageGallery extends StatefulWidget {
 }
 
 class _ProductImageGalleryState extends State<ProductImageGallery> {
+  final _pageController = PageController();
   int _index = 0;
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
         AspectRatio(
           aspectRatio: 1.2,
           child: PageView(
+            controller: _pageController,
             onPageChanged: (index) => setState(() => _index = index),
             children: [
-              for (final url in widget.images)
-                CachedImage(url: url, fit: BoxFit.contain),
+              for (var i = 0; i < widget.images.length; i++)
+                GestureDetector(
+                  onTap: () => _openViewer(i),
+                  child: Hero(
+                    tag: ProductImageViewer.heroTag(widget.images[i]),
+                    child: CachedImage(
+                      url: widget.images[i],
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
         if (widget.images.length > 1)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (var i = 0; i < widget.images.length; i++)
-                  Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: i == _index
-                          ? colors.primary
-                          : colors.outlineVariant,
-                    ),
-                  ),
-              ],
-            ),
+            child: ImagePageDots(count: widget.images.length, index: _index),
           ),
       ],
+    );
+  }
+
+  void _openViewer(int index) {
+    ProductImageViewer.open(
+      context,
+      images: widget.images,
+      initialIndex: index,
+      // Keeps the gallery on the image the viewer shows.
+      onIndexChanged: _pageController.jumpToPage,
     );
   }
 }
