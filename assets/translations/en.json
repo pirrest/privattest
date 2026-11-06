@@ -1,17 +1,20 @@
 {
   "common": {
     "retry": "Retry",
+    "price": "${}",
     "offlineBanner": "You are offline. Showing cached data."
   },
   "errors": {
     "noConnection": "No connection and nothing cached for this request.",
     "notFound": "This item is not available.",
-    "tryAgainLater": "Something went wrong. Please try again later."
+    "tryAgainLater": "Something went wrong. Please try again later.",
+    "startFailed": "Failed to start the app:\n{}"
   },
   "products": {
-    "title": "Products",
+    "title": "Shop",
     "searchHint": "Search products",
-    "noResults": "No products found."
+    "noResults": "No products found.",
+    "toggleTheme": "Switch between light and dark theme"
   },
   "details": {
     "title": "Product details",
@@ -19,6 +22,7 @@
     "specifications": "Specifications",
     "reviews": "Reviews ({})",
     "inStock": "In stock: {}",
+    "discount": "-{}%",
     "sku": "SKU",
     "weight": "Weight",
     "dimensions": "Dimensions (W×H×D)",

@@ -26,13 +26,15 @@ class ProductHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              '\$${product.price.toStringAsFixed(2)}',
+              'common.price'.tr(args: [product.price.toStringAsFixed(2)]),
               style: textTheme.headlineMedium,
             ),
             if (product.discountPercentage > 0) ...[
               const SizedBox(width: 8),
               Text(
-                '\$${product.originalPrice.toStringAsFixed(2)}',
+                'common.price'.tr(
+                  args: [product.originalPrice.toStringAsFixed(2)],
+                ),
                 style: textTheme.bodyMedium?.copyWith(
                   decoration: TextDecoration.lineThrough,
                   color: colors.outline,
@@ -40,7 +42,9 @@ class ProductHeader extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '-${product.discountPercentage.toStringAsFixed(0)}%',
+                'details.discount'.tr(
+                  args: [product.discountPercentage.toStringAsFixed(0)],
+                ),
                 style: textTheme.titleSmall?.copyWith(color: colors.error),
               ),
             ],

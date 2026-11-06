@@ -1,7 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 
-ThemeData createMainTheme() {
-  final colorScheme = ColorScheme.fromSeed(seedColor: Colors.lightBlue);
+ThemeData createMainTheme({required Brightness brightness}) {
+  final colorScheme = ColorScheme.fromSeed(
+    seedColor: Colors.lightBlue,
+    brightness: brightness,
+  );
 
   return ThemeData(
     useMaterial3: true,

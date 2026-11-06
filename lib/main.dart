@@ -1,3 +1,4 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:privat_test/core/controller/commands/initialize_app_command.dart';
@@ -6,6 +7,7 @@ import 'package:privat_test/shop/dependencies.dart';
 import 'package:privat_test/shop/view/navigation/shop_page_path.dart';
 import 'package:privat_test/shop/view/navigation/shop_routes.dart';
 import 'package:privat_test/core/view/app/theme/theme.dart';
+import 'package:privat_test/core/view/app/theme/theme_cubit.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:watch_it/watch_it.dart';
 
@@ -40,9 +42,22 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(create: (_) => ThemeCubit(), child: const _AppView());
+  }
+}
+
+class _AppView extends StatelessWidget {
+  const _AppView();
+
+  @override
+  Widget build(BuildContext context) {
+    final themeMode = context.watch<ThemeCubit>().state;
+
     return MaterialApp.router(
-      title: 'Products',
-      theme: createMainTheme(),
+      onGenerateTitle: (context) => 'products.title'.tr(),
+      theme: createMainTheme(brightness: Brightness.light),
+      darkTheme: createMainTheme(brightness: Brightness.dark),
+      themeMode: themeMode,
       routerConfig: di<GoRouter>(),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -63,7 +78,7 @@ class InitializationErrorApp extends StatelessWidget {
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text('Failed to start the app:\n$error'),
+            child: Text('errors.startFailed'.tr(args: ['$error'])),
           ),
         ),
       ),

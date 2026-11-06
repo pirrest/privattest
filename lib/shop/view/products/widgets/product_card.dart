@@ -48,7 +48,9 @@ class ProductCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '\$${product.price.toStringAsFixed(2)}',
+                        'common.price'.tr(
+                          args: [product.price.toStringAsFixed(2)],
+                        ),
                         style: textTheme.titleMedium,
                       ),
                       RatingBadge(rating: product.rating),
