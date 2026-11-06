@@ -10,10 +10,14 @@ A Flutter app for searching and browsing products from the public
   them. Each cell or row shows the preview, title, description, price and
   rating. By default it lists all products.
 - **Search** — triggers from 2 characters, debounced by 1 s, and replaces the
-  grid contents with the matches. With an empty or shorter query the grid lists
+  list contents with the matches. With an empty or shorter query the list shows
   all products.
 - **Details screen** — image gallery, brand, category, price and discount,
-  rating, stock, description, tags, specifications and reviews.
+  rating, stock, description, tags, specifications and reviews. Tapping an image
+  opens a full-screen viewer: pinch or double tap to zoom, swipe between images.
+- **Dark mode** — follows the system theme; a button in the app bar switches
+  between light and dark. Neither this choice nor the grid/table choice is
+  remembered after a restart.
 - **Offline mode** — every product the app has seen is stored in SQLite. With no
   connection, the list and search run locally over the cached products, details open from
   the cache, and images come from the disk cache. A banner at the top of every
@@ -51,6 +55,12 @@ Run configurations named `dev`, `stg` and `prod` are committed for both IDEs:
 `.run/*.run.xml` for IntelliJ IDEA / Android Studio and `.vscode/launch.json`
 for VS Code. Each one runs `lib/main.dart` with the matching config file.
 
+Try the offline mode: load a few pages online, then run against an address that
+cannot be reached. Create `config/offline.local.json` (git-ignored) with
+`{"API_BASE_URL": "http://127.0.0.1:9"}` and start the app with
+`--dart-define-from-file=config/offline.local.json`; the products you saw stay
+available. Airplane mode on a device or emulator works too.
+
 Try the deep link:
 
 ```sh
@@ -77,8 +87,9 @@ and `view`:
     the `--dart-define-from-file` config), `HttpClient` (dio),
     `ConnectionService` and `LoggerService`, and in `controller/commands/` the `InitializeAppCommand`:
     it registers these plus the router, then lets each domain register itself.
-  - `view/` — theme (light/dark, `ThemeCubit`), the shared `export.dart` barrel and
-    widgets used by any screen (`ErrorView`, `OfflineBanner`, `CachedImage`).
+  - `view/` — theme (light/dark, `ThemeCubit`), `ConnectionCubit` (feeds the
+    offline banner), the shared `export.dart` barrel and widgets used by any
+    screen (`ErrorView`, `OfflineBanner`, `CachedImage`).
 - **`lib/shop`** — everything that belongs to products.
   - `model/` — `Product` and friends: hand-written `fromMap`/`toMap` with
     `Equatable`.
@@ -126,7 +137,7 @@ Besides Flutter itself and `equatable` (value equality for models):
 | `watch_it` | Service locator used for dependency injection (it re-exports `get_it` as `di`). |
 | `material_ui` | Material widgets and theme (the package that replaces `package:flutter/material.dart`). `go_router` 18 recognizes only this one, so pages get the platform transitions and the iOS swipe-back gesture. |
 | `go_router` | Declarative routing with path parameters (`/product/:id`) and deep links. |
-| `infinite_scroll_pagination` | Handles page keys, loading/error/empty states and retry for the paginated grid. |
+| `infinite_scroll_pagination` | Handles page keys, loading/error/empty states and retry for the paginated grid and table. |
 | `cached_network_image` | Caches images on disk so previews and galleries also show offline. |
 | `easy_localization` | UI strings live in `assets/translations/en.json` instead of the code. |
 | `sqflite_common_ffi` (dev) | Runs the SQLite repository tests on the host machine. |
@@ -136,7 +147,7 @@ mocking library.
 
 ## Notes
 
-- Search needs at least 2 characters. Below that, the grid lists all products.
+- Search needs at least 2 characters. Below that, the list shows all products.
 - Offline with nothing cached shows a "no connection" message with Retry, not an
   empty list. Offline details of a product that was only seen in the list show
   its list thumbnail, because the full-size images were never downloaded.
