@@ -15,7 +15,8 @@
     "title": "Shop",
     "searchHint": "Search products",
     "noResults": "No products found.",
-    "toggleTheme": "Switch between light and dark theme"
+    "toggleTheme": "Switch between light and dark theme",
+    "toggleView": "Switch between grid and table"
   },
   "details": {
     "title": "Product details",

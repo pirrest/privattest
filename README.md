@@ -5,9 +5,10 @@ A Flutter app for searching and browsing products from the public
 
 ## Features
 
-- **Product grid** with infinite-scroll pagination (`limit`/`skip`). Each cell
-  shows the preview, title, description, price and rating. By default it lists
-  all products.
+- **Product list** with infinite-scroll pagination (`limit`/`skip`), shown as a
+  grid of cards or as a table of rows; a button in the app bar switches between
+  them. Each cell or row shows the preview, title, description, price and
+  rating. By default it lists all products.
 - **Search** — triggers from 2 characters, debounced by 1 s, and replaces the
   grid contents with the matches. With an empty or shorter query the grid lists
   all products.

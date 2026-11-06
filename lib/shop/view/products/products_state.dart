@@ -11,7 +11,15 @@ class ProductsState extends Equatable {
   /// Total number of matches for [searchQuery], known after the first page.
   final int? totalItems;
 
-  const ProductsState({this.query = '', this.searchQuery, this.totalItems});
+  /// How the products are laid out: cards in a grid or rows in a table.
+  final ProductsViewMode viewMode;
+
+  const ProductsState({
+    this.query = '',
+    this.searchQuery,
+    this.totalItems,
+    this.viewMode = ProductsViewMode.grid,
+  });
 
   ProductsState copyWith({
     String? query,
@@ -19,14 +27,16 @@ class ProductsState extends Equatable {
     bool clearSearchQuery = false,
     int? totalItems,
     bool clearTotal = false,
+    ProductsViewMode? viewMode,
   }) {
     return ProductsState(
       query: query ?? this.query,
       searchQuery: clearSearchQuery ? null : searchQuery ?? this.searchQuery,
       totalItems: clearTotal ? null : totalItems ?? this.totalItems,
+      viewMode: viewMode ?? this.viewMode,
     );
   }
 
   @override
-  List<Object?> get props => [query, searchQuery, totalItems];
+  List<Object?> get props => [query, searchQuery, totalItems, viewMode];
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:privat_test/shop/controller/products_service.dart';
 import 'package:privat_test/shop/model/product.dart';
+import 'package:privat_test/shop/view/products/products_view_mode.dart';
 import 'package:privat_test/core/utils/my_cubit.dart';
 
 part 'products_state.dart';
@@ -31,6 +32,11 @@ class ProductsCubit extends MyCubit<ProductsState> {
 
     emit(state.copyWith(query: query));
     _debounce = Timer(debounceDuration, () => _startSearch(query));
+  }
+
+  /// Switches between the grid and the table view.
+  void onViewModeToggled() {
+    emit(state.copyWith(viewMode: state.viewMode.toggled));
   }
 
   /// Loads the page that starts at [skip]: search results for the active
