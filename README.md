@@ -116,6 +116,7 @@ Besides Flutter itself and `equatable` (value equality for models):
 | `dio` | HTTP client required by the task. Retrofit and code generation were deliberately skipped: there are only two endpoints, so a small hand-written `ApiService` is clearer. |
 | `sqflite`, `path` | Local database for the offline cache (required by the task); `path` builds the database file path. |
 | `watch_it` | Service locator used for dependency injection (it re-exports `get_it` as `di`). |
+| `material_ui` | Material widgets and theme (the package that replaces `package:flutter/material.dart`). `go_router` 18 recognizes only this one, so pages get the platform transitions and the iOS swipe-back gesture. |
 | `go_router` | Declarative routing with path parameters (`/product/:id`) and deep links. |
 | `infinite_scroll_pagination` | Handles page keys, loading/error/empty states and retry for the paginated grid. |
 | `cached_network_image` | Caches images on disk so previews and galleries also show offline. |

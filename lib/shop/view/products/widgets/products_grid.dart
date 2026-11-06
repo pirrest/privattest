@@ -42,7 +42,7 @@ class _ProductsGridState extends State<ProductsGrid> {
 
     return PagingListener<int, Product>(
       controller: _controller,
-      builder: (context, state, fetchNextPage) => RefreshIndicator(
+      builder: (context, state, fetchNextPage) => RefreshIndicator.adaptive(
         onRefresh: () async => _controller.refresh(),
         child: PagedGridView<int, Product>(
           state: state,
@@ -62,6 +62,14 @@ class _ProductsGridState extends State<ProductsGrid> {
                 FocusScope.of(context).unfocus();
                 context.push(ShopPagePath.productDetailsOf(product.id));
               },
+            ),
+            // Own indicators, so no widget from the package's default
+            // (flutter/material based) indicators is used.
+            firstPageProgressIndicatorBuilder: (context) =>
+                const Center(child: CircularProgressIndicator.adaptive()),
+            newPageProgressIndicatorBuilder: (context) => const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator.adaptive()),
             ),
             firstPageErrorIndicatorBuilder: (context) => ErrorView(
               error: _controller.value.error,

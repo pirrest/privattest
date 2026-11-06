@@ -20,7 +20,7 @@ class ProductDetailsPage extends StatelessWidget {
           isOffline: state.isOffline,
         ),
         null when state.isLoading => const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator.adaptive(),
         ),
         null => ErrorView(error: state.error, onRetry: cubit.load),
       },

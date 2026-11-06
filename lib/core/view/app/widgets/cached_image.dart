@@ -16,7 +16,9 @@ class CachedImage extends StatelessWidget {
       fit: fit,
       placeholder: (context, url) => ColoredBox(
         color: colors.surface,
-        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+        child: const Center(
+          child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+        ),
       ),
       errorWidget: (context, url, error) => ColoredBox(
         color: colors.surfaceContainerHighest,
