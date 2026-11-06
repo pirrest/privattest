@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Personal config overrides (the committed config/*.json hold no secrets)
+config/*.local.json

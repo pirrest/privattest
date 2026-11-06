@@ -34,13 +34,11 @@ class Dispatcher<Event> {
     lastEvent = event;
     // using copy to avoid concurrent modification exception
     final listeners = {...this.listeners};
-    scheduleMicrotask(
-      () {
-        for (final listener in listeners.values) {
-          listener(event);
-        }
-      },
-    );
+    scheduleMicrotask(() {
+      for (final listener in listeners.values) {
+        listener(event);
+      }
+    });
   }
 }
 
