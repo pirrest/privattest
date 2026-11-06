@@ -15,15 +15,28 @@ class ProductsSearchField extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
+        isDense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         hintText: 'products.searchHint'.tr(),
-        prefixIcon: const Icon(Icons.search),
+        prefixIcon: const Icon(Icons.search, size: 20),
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 32,
+        ),
+        suffixIconConstraints: const BoxConstraints(
+          minWidth: 40,
+          minHeight: 32,
+        ),
         suffixIcon: ValueListenableBuilder<TextEditingValue>(
           valueListenable: controller,
           builder: (context, value, _) => value.text.isEmpty
               ? const SizedBox.shrink()
               : IconButton(
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 20,
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     controller.clear();
