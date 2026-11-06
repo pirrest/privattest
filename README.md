@@ -76,8 +76,8 @@ and `view`:
     the `--dart-define-from-file` config), `HttpClient` (dio),
     `ConnectionService` and `LoggerService`, and in `controller/commands/` the `InitializeAppCommand`:
     it registers these plus the router, then lets each domain register itself.
-  - `view/` — router, theme, the shared `export.dart` barrel and widgets used
-    by any screen (`ErrorView`, `OfflineBanner`, `CachedImage`).
+  - `view/` — theme (light/dark, `ThemeCubit`), the shared `export.dart` barrel and
+    widgets used by any screen (`ErrorView`, `OfflineBanner`, `CachedImage`).
 - **`lib/shop`** — everything that belongs to products.
   - `model/` — `Product` and friends: hand-written `fromMap`/`toMap` with
     `Equatable`.
@@ -85,7 +85,7 @@ and `view`:
     database file.
   - `controller/` — `ShopApiService`, `ProductsService`.
   - `view/` — one folder per screen (page, cubit, state as a `part` file,
-    widgets), plus `shop_routes.dart` and `PagePath`.
+    widgets), plus `shop_routes.dart` and `ShopPagePath`.
   - `dependencies.dart` — `registerShopDependencies()`.
 - **`lib/main.dart`** — the composition root, the only place that knows both
   domains: it passes the shop routes and `registerShopDependencies` to
@@ -120,7 +120,7 @@ Besides Flutter itself and `equatable` (value equality for models):
 | Package | Why |
 | --- | --- |
 | `bloc`, `flutter_bloc` | State management required by the task; cubits drive each screen. |
-| `dio` | HTTP client required by the task. Retrofit and code generation were deliberately skipped: there are only two endpoints, so a small hand-written `ApiService` is clearer. |
+| `dio` | HTTP client required by the task. Retrofit and code generation were deliberately skipped: there are only two endpoints, so a small hand-written `ShopApiService` is clearer. |
 | `sqflite`, `path` | Local database for the offline cache (required by the task); `path` builds the database file path. |
 | `watch_it` | Service locator used for dependency injection (it re-exports `get_it` as `di`). |
 | `material_ui` | Material widgets and theme (the package that replaces `package:flutter/material.dart`). `go_router` 18 recognizes only this one, so pages get the platform transitions and the iOS swipe-back gesture. |
@@ -136,6 +136,9 @@ mocking library.
 ## Notes
 
 - Search needs at least 2 characters. Below that, the grid lists all products.
+- Offline with nothing cached shows a "no connection" message with Retry, not an
+  empty list. Offline details of a product that was only seen in the list show
+  its list thumbnail, because the full-size images were never downloaded.
 - Offline search is a case-insensitive substring match over the cached
   title, description, category, brand and tags, so it can differ slightly from
   the server's results.

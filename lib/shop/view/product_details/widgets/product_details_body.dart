@@ -15,6 +15,7 @@ class ProductDetailsBody extends StatelessWidget {
     return ListView(
       children: [
         ProductImageGallery(
+          fallbackUrl: product.thumbnail,
           images: product.images.isEmpty ? [product.thumbnail] : product.images,
         ),
         Padding(

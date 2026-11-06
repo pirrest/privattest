@@ -6,7 +6,13 @@ import 'package:privat_test/shop/view/product_details/widgets/product_image_view
 class ProductImageGallery extends StatefulWidget {
   final List<String> images;
 
-  const ProductImageGallery({super.key, required this.images});
+  final String fallbackUrl;
+
+  const ProductImageGallery({
+    super.key,
+    required this.images,
+    required this.fallbackUrl,
+  });
 
   @override
   State<ProductImageGallery> createState() => _ProductImageGalleryState();
@@ -40,6 +46,7 @@ class _ProductImageGalleryState extends State<ProductImageGallery> {
                     child: CachedImage(
                       url: widget.images[i],
                       fit: BoxFit.contain,
+                      fallbackUrl: i == 0 ? widget.fallbackUrl : null,
                     ),
                   ),
                 ),
@@ -59,6 +66,7 @@ class _ProductImageGalleryState extends State<ProductImageGallery> {
     ProductImageViewer.open(
       context,
       images: widget.images,
+      fallbackUrl: widget.fallbackUrl,
       initialIndex: index,
       // Keeps the gallery on the image the viewer shows.
       onIndexChanged: _pageController.jumpToPage,

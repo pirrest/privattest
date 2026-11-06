@@ -4,6 +4,7 @@ import 'package:privat_test/shop/view/product_details/widgets/image_page_dots.da
 
 class ProductImageViewer extends StatefulWidget {
   final List<String> images;
+  final String fallbackUrl;
   final int initialIndex;
 
   final ValueChanged<int> onIndexChanged;
@@ -13,6 +14,7 @@ class ProductImageViewer extends StatefulWidget {
   const ProductImageViewer({
     super.key,
     required this.images,
+    required this.fallbackUrl,
     required this.initialIndex,
     required this.onIndexChanged,
   });
@@ -20,6 +22,7 @@ class ProductImageViewer extends StatefulWidget {
   static Future<void> open(
     BuildContext context, {
     required List<String> images,
+    required String fallbackUrl,
     required int initialIndex,
     required ValueChanged<int> onIndexChanged,
   }) {
@@ -30,6 +33,7 @@ class ProductImageViewer extends StatefulWidget {
         pageBuilder: (context, animation, secondaryAnimation) =>
             ProductImageViewer(
               images: images,
+              fallbackUrl: fallbackUrl,
               initialIndex: initialIndex,
               onIndexChanged: onIndexChanged,
             ),
@@ -77,6 +81,7 @@ class _ProductImageViewerState extends State<ProductImageViewer> {
             },
             itemBuilder: (context, index) => _ZoomableImage(
               url: widget.images[index],
+              fallbackUrl: index == 0 ? widget.fallbackUrl : null,
               onZoomChanged: (isZoomed) {
                 if (index == _index && isZoomed != _isZoomed) {
                   setState(() => _isZoomed = isZoomed);
@@ -121,9 +126,14 @@ class _ZoomableImage extends StatefulWidget {
   static const _doubleTapScale = 2.5;
 
   final String url;
+  final String? fallbackUrl;
   final ValueChanged<bool> onZoomChanged;
 
-  const _ZoomableImage({required this.url, required this.onZoomChanged});
+  const _ZoomableImage({
+    required this.url,
+    required this.fallbackUrl,
+    required this.onZoomChanged,
+  });
 
   @override
   State<_ZoomableImage> createState() => _ZoomableImageState();
@@ -154,7 +164,11 @@ class _ZoomableImageState extends State<_ZoomableImage> {
         onInteractionEnd: (_) => _syncZoom(),
         child: Hero(
           tag: ProductImageViewer.heroTag(widget.url),
-          child: CachedImage(url: widget.url, fit: BoxFit.contain),
+          child: CachedImage(
+            url: widget.url,
+            fit: BoxFit.contain,
+            fallbackUrl: widget.fallbackUrl,
+          ),
         ),
       ),
     );

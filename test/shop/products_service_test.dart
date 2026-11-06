@@ -1,6 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:privat_test/shop/controller/products_service.dart';
-import 'package:privat_test/shop/model/exceptions/product_not_found_exception.dart';
+import 'package:privat_test/core/model/exceptions/not_found_exception.dart';
 import 'package:privat_test/shop/model/repositories/products_repo.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -89,6 +90,29 @@ void main() {
       expect(page.items.map((p) => p.id), [1, 2]);
     });
 
+    test('rethrows the connection error when offline with an empty cache', () {
+      api.onGetProducts = (limit, skip) async => throw noConnectionError();
+
+      expect(
+        service.loadPage(query: '', skip: 0),
+        throwsA(isA<DioException>()),
+      );
+    });
+
+    test(
+      'an offline search without matches in a filled cache is empty',
+      () async {
+        api.onGetProducts = (limit, skip) async =>
+            searchResponse([sampleProductMap(id: 1)]);
+        await service.loadPage(query: '', skip: 0);
+
+        api.onSearch = (query, limit, skip) async => throw noConnectionError();
+        final page = await service.loadPage(query: 'zzzz', skip: 0);
+
+        expect(page.items, isEmpty);
+      },
+    );
+
     test('rethrows HTTP errors instead of using the cache', () async {
       api.onSearch = (query, limit, skip) async => throw httpError(500);
 
@@ -119,16 +143,16 @@ void main() {
       expect(product.id, 5);
     });
 
-    test('throws ProductNotFoundException when offline and not cached', () {
+    test('rethrows the connection error when offline and not cached', () {
       api.onGetProduct = (id) async => throw noConnectionError();
 
-      expect(service.loadProduct(99), throwsA(isA<ProductNotFoundException>()));
+      expect(service.loadProduct(99), throwsA(isA<DioException>()));
     });
 
-    test('throws ProductNotFoundException on HTTP 404', () {
+    test('throws NotFoundException on HTTP 404', () {
       api.onGetProduct = (id) async => throw httpError(404);
 
-      expect(service.loadProduct(99), throwsA(isA<ProductNotFoundException>()));
+      expect(service.loadProduct(99), throwsA(isA<NotFoundException>()));
     });
   });
 }

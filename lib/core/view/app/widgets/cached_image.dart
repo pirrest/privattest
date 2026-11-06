@@ -1,12 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:privat_test/core/view/export.dart';
 
-/// Network image that is cached on disk, so it also shows up offline.
 class CachedImage extends StatelessWidget {
   final String url;
   final BoxFit fit;
 
-  const CachedImage({super.key, required this.url, this.fit = BoxFit.cover});
+  final String? fallbackUrl;
+
+  const CachedImage({
+    super.key,
+    required this.url,
+    this.fit = BoxFit.cover,
+    this.fallbackUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +26,23 @@ class CachedImage extends StatelessWidget {
           child: CircularProgressIndicator.adaptive(strokeWidth: 2),
         ),
       ),
-      errorWidget: (context, url, error) => ColoredBox(
-        color: colors.surfaceContainerHighest,
-        child: Icon(Icons.image_not_supported_outlined, color: colors.outline),
-      ),
+      errorWidget: (context, url, error) {
+        final fallbackUrl = this.fallbackUrl;
+        if (fallbackUrl == null) return _brokenImage(colors);
+
+        return CachedNetworkImage(
+          imageUrl: fallbackUrl,
+          fit: fit,
+          errorWidget: (context, url, error) => _brokenImage(colors),
+        );
+      },
+    );
+  }
+
+  Widget _brokenImage(ColorScheme colors) {
+    return ColoredBox(
+      color: colors.surfaceContainerHighest,
+      child: Icon(Icons.image_not_supported_outlined, color: colors.outline),
     );
   }
 }

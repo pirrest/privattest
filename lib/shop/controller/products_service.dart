@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:privat_test/core/utils/casting.dart';
 import 'package:privat_test/shop/controller/shop_api_service.dart';
 import 'package:privat_test/core/controller/logger_service.dart';
-import 'package:privat_test/shop/model/exceptions/product_not_found_exception.dart';
+import 'package:privat_test/core/model/exceptions/not_found_exception.dart';
 import 'package:privat_test/shop/model/product.dart';
 import 'package:privat_test/shop/model/products_page.dart';
 import 'package:privat_test/shop/model/repositories/products_repo.dart';
@@ -18,9 +18,6 @@ class ProductsService {
 
   ProductsService(this._apiService, this._productsRepo);
 
-  /// Loads one page of products: all products for an empty [query], search
-  /// results otherwise. Goes to the API first and caches what it returns; when
-  /// there is no connection it reads the local cache instead.
   Future<ProductsPage> loadPage({
     required String query,
     required int skip,
@@ -53,13 +50,13 @@ class ProductsService {
         skip: skip,
       );
       final total = await _productsRepo.count(query);
+      // Nothing cached at all: show the connection error, not an empty list.
+      if (items.isEmpty && await _productsRepo.count('') == 0) rethrow;
+
       return ProductsPage(items: items, total: total, skip: skip);
     }
   }
 
-  /// Loads a single product by id, falling back to the local cache when
-  /// there is no connection. Throws [ProductNotFoundException] when the
-  /// product does not exist or is not cached.
   Future<Product> loadProduct(int id) async {
     try {
       final map = await _apiService.getProduct(id);
@@ -68,12 +65,13 @@ class ProductsService {
       return product;
     } on DioException catch (e) {
       if (e.response?.statusCode == HttpStatus.notFound) {
-        throw ProductNotFoundException(id);
+        throw const NotFoundException();
       }
       if (!e.isConnectionFailure) rethrow;
 
       final cached = await _productsRepo.getById(id);
-      if (cached == null) throw ProductNotFoundException(id);
+      // Not cached and no connection: the product may well exist.
+      if (cached == null) rethrow;
 
       return cached;
     }
